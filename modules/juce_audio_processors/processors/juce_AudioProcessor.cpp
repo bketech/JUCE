@@ -55,6 +55,95 @@ AudioProcessor::~AudioProcessor()
    #endif
 }
 
+// element addtions
+
+int
+AudioProcessor::getChannelPort (uint32 port)
+{
+    jassert (port < (uint32) getNumPorts());
+    int channel = 0;
+    PortType type = getPortType (port);
+
+    for (uint32 i = 0; i < (uint32)getNumPorts(); ++i)
+    {
+        if (type == getPortType(port) && i == port)
+            return channel;
+        ++channel;
+    }
+
+    return -1;
+}
+
+uint32 AudioProcessor::getNumPorts()
+{
+    return getNumInputChannels() + getNumOutputChannels() +
+           getNumParameters() + (acceptsMidi() ? 1 : 0) + (producesMidi() ? 1 : 0);
+}
+
+uint32 AudioProcessor::getNumPorts (PortType type, bool isInput)
+{
+    uint32 count = 0;
+    for (uint32 port = 0; port < getNumPorts(); ++port)
+        if (isInput == isPortInput (port) && type == getPortType (port))
+            ++count;
+    return count;
+}
+
+uint32 AudioProcessor::getNthPort (PortType type, int index, bool isInput, bool oneBased)
+{
+    int count = oneBased ? 0 : -1;
+
+    jassert (getNumPorts() >= 0);
+    uint32 nports = (uint32) getNumPorts();
+
+    for (uint32 port = 0; port < nports; ++port)
+        if (isInput == isPortInput (port) && type == getPortType (port))
+            if (++count == index)
+                return port;
+
+    jassertfalse;
+    return JUCE_INVALID_PORT;
+}
+
+bool AudioProcessor::isPortInput (uint32 port)
+{
+    if (port >= getNumPorts())
+        jassertfalse;
+
+    if (port < getNumInputChannels())
+        return true;
+
+    // is a parameter port (control input)
+    if (port >= (getNumInputChannels() + getNumOutputChannels())
+            && port < getNumInputChannels() + getNumOutputChannels() + getNumParameters())
+    {
+        return true;
+    }
+
+    if (port >= getNumInputChannels() + getNumOutputChannels() + getNumParameters()
+            && port < getNumPorts() && acceptsMidi())
+    {
+        return true;
+    }
+
+    return false;
+}
+
+PortType AudioProcessor::getPortType (uint32 port)
+{
+    if (port < (getNumInputChannels() + getNumOutputChannels()))
+        return PortType::Audio;
+    if (port >= (getNumInputChannels() + getNumOutputChannels())
+         && port < (getNumInputChannels() + getNumOutputChannels() + getNumParameters()))
+        return PortType::Control;
+    if (port >= (getNumInputChannels() + getNumOutputChannels() + getNumParameters())
+                && port < getNumPorts())
+        return PortType::Atom;
+    return PortType::Unknown;
+}
+
+// element additions end
+
 void AudioProcessor::setPlayHead (AudioPlayHead* const newPlayHead) noexcept
 {
     playHead = newPlayHead;

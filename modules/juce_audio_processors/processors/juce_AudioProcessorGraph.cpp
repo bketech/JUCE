@@ -33,7 +33,7 @@ class AudioGraphRenderingOp
 {
 public:
     AudioGraphRenderingOp() {}
-    virtual ~AudioGraphRenderingOp()  {}
+    virtual ~AudioGraphRenderingOp()  { }
 
     virtual void perform (AudioSampleBuffer& sharedBufferChans,
                           const OwnedArray <MidiBuffer>& sharedMidiBuffers,

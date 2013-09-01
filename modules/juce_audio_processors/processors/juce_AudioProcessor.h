@@ -25,6 +25,10 @@
 #ifndef JUCE_AUDIOPROCESSOR_H_INCLUDED
 #define JUCE_AUDIOPROCESSOR_H_INCLUDED
 
+#include "juce_AudioProcessorEditor.h"
+#include "juce_AudioProcessorListener.h"
+#include "juce_AudioPlayHead.h"
+#include "juce_PortType.h"
 
 //==============================================================================
 /**
@@ -54,6 +58,35 @@ protected:
 public:
     /** Destructor. */
     virtual ~AudioProcessor();
+
+    //==============================================================================
+    // Element additions for port processing
+    // Note that new processors that wish to be port-based MUST re-implement
+    // the virtual methods below.  The default implementations are geared around
+    // pre-exising AudioProcessors as to not break compatibility with normal juce
+    // audio code.
+
+    /** Returns a channel index for a given port */
+    int getChannelPort (uint32 port);
+
+    /** Returns the total number of ports for this processor */
+    virtual uint32 getNumPorts();
+
+    /** Returns the total number of ports for a given filter */
+    virtual uint32 getNumPorts (PortType type, bool isInput);
+
+    /** Returns the port index from a 'channel' index of a particular
+        port type */
+    uint32 getNthPort (PortType type, int index, bool isInput, bool indexIsOneBased = true);
+
+    /** Returns the type for a given port */
+    virtual PortType getPortType (uint32 port);
+
+    /** Returns true if the port is an input (destination port) */
+    virtual bool isPortInput (uint32 port);
+
+    /** Returns true if the port is an output (source port) */
+    bool isPortOutput (uint32 port) { return ! isPortInput (port); }
 
     //==============================================================================
     /** Returns the name of this processor. */

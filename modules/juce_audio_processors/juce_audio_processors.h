@@ -28,6 +28,9 @@
 #include "../juce_gui_basics/juce_gui_basics.h"
 #include "../juce_audio_basics/juce_audio_basics.h"
 
+#include <lv2/lv2plug.in/ns/lv2core/lv2.h>
+#include <lv2/lv2plug.in/ns/ext/atom/atom.h>
+#include <lv2/lv2plug.in/ns/ext/midi/midi.h>
 
 //=============================================================================
 /** Config: JUCE_PLUGINHOST_VST
