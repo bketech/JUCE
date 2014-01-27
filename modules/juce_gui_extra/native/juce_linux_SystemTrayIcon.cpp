@@ -22,6 +22,8 @@
   ==============================================================================
 */
 
+#if JUCE_USE_X11
+
 extern Display* display;
 
 //==============================================================================
@@ -140,3 +142,6 @@ void* SystemTrayIconComponent::getNativeHandle() const
 {
     return getWindowHandle();
 }
+
+#endif
+

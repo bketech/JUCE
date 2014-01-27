@@ -25,7 +25,7 @@
 #ifndef JUCE_SYSTEMTRAYICONCOMPONENT_H_INCLUDED
 #define JUCE_SYSTEMTRAYICONCOMPONENT_H_INCLUDED
 
-#if JUCE_WINDOWS || JUCE_LINUX || JUCE_MAC || DOXYGEN
+#if JUCE_WINDOWS || JUCE_USE_X11 || JUCE_MAC || DOXYGEN
 
 
 //==============================================================================
