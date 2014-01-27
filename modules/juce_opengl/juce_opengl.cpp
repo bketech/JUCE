@@ -51,7 +51,7 @@
  #endif
 
 //==============================================================================
-#elif JUCE_USE_X11
+#elif JUCE_LINUX && JUCE_USE_X11
  /* Got an include error here?
 
     If you want to install OpenGL support, the packages to get are "mesa-common-dev"
@@ -60,7 +60,7 @@
  #include <GL/glx.h>
 
 //==============================================================================
-#elif JUCE_USE_EGL
+#elif JUCE_LINUX && JUCE_USE_EGL
  /* Got an include error here?
 
     If you want to install OpenGL support, the packages to get are "libegl1-mesa-dev".
