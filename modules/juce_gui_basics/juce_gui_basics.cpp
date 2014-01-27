@@ -94,7 +94,7 @@
  #endif
 
 //==============================================================================
-#elif JUCE_LINUX
+#elif JUCE_USE_X11
  #include <X11/Xlib.h>
  #include <X11/Xatom.h>
  #include <X11/Xresource.h>
@@ -129,6 +129,13 @@
 
  #undef SIZEOF
  #undef KeyPress
+
+#elif JUCE_USE_EGL
+ #include <EGL/egl.h>
+ #include <X11/Xlib-xcb.h>
+ #include <xcb/xcb.h>
+ #undef KeyPress
+
 #endif
 
 //==============================================================================
@@ -276,10 +283,17 @@ extern bool juce_areThereAnyAlwaysOnTopWindows();
  #include "native/juce_win32_DragAndDrop.cpp"
  #include "native/juce_win32_FileChooser.cpp"
 
-#elif JUCE_LINUX
+#elif JUCE_LINUX && JUCE_USE_X11
  #include "native/juce_linux_Clipboard.cpp"
  #include "native/juce_linux_Windowing.cpp"
  #include "native/juce_linux_FileChooser.cpp"
+
+#elif JUCE_LINUX && JUCE_USE_EGL
+ #include "native/juce_egl_Platform.h"
+ #include "native/juce_egl_Windowing.cpp"
+ #include "native/juce_egl_FileChooser.cpp"
+ #include "native/juce_egl_Platform.cpp"
+ #include "native/juce_egl_XcbPlatform.cpp"
 
 #elif JUCE_ANDROID
  #include "../juce_core/native/juce_android_JNIHelpers.h"
