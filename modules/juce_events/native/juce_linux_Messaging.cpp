@@ -94,7 +94,6 @@ public:
 
     bool dispatchNextEvent()
     {
-        jassert (MessageManager::isThisTheMessageThread());
         // This alternates between giving priority to XEvents or internal messages,
         // to keep everything running smoothly..
         if ((++totalEventCount & 1) != 0)
