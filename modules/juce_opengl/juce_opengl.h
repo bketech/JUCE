@@ -30,7 +30,7 @@
 #undef JUCE_OPENGL
 #define JUCE_OPENGL 1
 
-#if JUCE_IOS || JUCE_ANDROID
+#if JUCE_IOS || JUCE_ANDROID || JUCE_USE_EGL
  #define JUCE_OPENGL_ES 1
  #define JUCE_USE_OPENGL_FIXED_FUNCTION 0
 #endif
@@ -53,9 +53,11 @@
   #undef APIENTRY
   #undef CLEAR_TEMP_APIENTRY
  #endif
-#elif JUCE_LINUX
- #include <GL/gl.h>
- #undef KeyPress
+#elif JUCE_USE_X11
+  #include <GL/gl.h>
+  #undef KeyPress
+#elif JUCE_USE_EGL
+  #include <GLES2/gl2.h>
 #elif JUCE_IOS
  #include <OpenGLES/ES2/gl.h>
 #elif JUCE_MAC

@@ -112,7 +112,7 @@ struct OpenGLExtensionFunctions
     typedef pointer_sized_int GLintptr;
    #endif
 
-   #if JUCE_WINDOWS || JUCE_LINUX
+   #if JUCE_WINDOWS || JUCE_LINUX && ! JUCE_OPENGL_ES
     #if JUCE_WINDOWS
      #define JUCE_GL_STDCALL __stdcall
     #else

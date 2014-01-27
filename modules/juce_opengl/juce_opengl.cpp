@@ -51,13 +51,21 @@
  #endif
 
 //==============================================================================
-#elif JUCE_LINUX
+#elif JUCE_USE_X11
  /* Got an include error here?
 
     If you want to install OpenGL support, the packages to get are "mesa-common-dev"
     and "freeglut3-dev".
  */
  #include <GL/glx.h>
+
+//==============================================================================
+#elif JUCE_USE_EGL
+ /* Got an include error here?
+
+    If you want to install OpenGL support, the packages to get are "libegl1-mesa-dev".
+ */
+ #include <EGL/egl.h>
 
 //==============================================================================
 #elif JUCE_MAC
@@ -80,7 +88,7 @@ namespace juce
 
 void OpenGLExtensionFunctions::initialise()
 {
-   #if JUCE_WINDOWS || JUCE_LINUX
+   #if JUCE_WINDOWS || JUCE_LINUX && ! JUCE_OPENGL_ES
     #define JUCE_INIT_GL_FUNCTION(name, returnType, params, callparams) \
         name = (type_ ## name) OpenGLHelpers::getExtensionFunction (#name);
     #define JUCE_INIT_GL_FUNCTION_EXT(name, returnType, params, callparams) \
@@ -202,8 +210,11 @@ private:
 #elif JUCE_WINDOWS
  #include "native/juce_OpenGL_win32.h"
 
-#elif JUCE_LINUX
+#elif JUCE_USE_X11
  #include "native/juce_OpenGL_linux.h"
+
+#elif JUCE_USE_EGL
+ #include "native/juce_OpenGL_egl.h"
 
 #elif JUCE_ANDROID
  #include "../juce_core/native/juce_android_JNIHelpers.h"
