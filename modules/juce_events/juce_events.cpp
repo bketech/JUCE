@@ -51,10 +51,12 @@
  #import <IOKit/pwr_mgt/IOPMLib.h>
 
 #elif JUCE_LINUX
- #include <X11/Xlib.h>
- #include <X11/Xresource.h>
- #include <X11/Xutil.h>
- #undef KeyPress
+ #if JUCE_USE_XEVENTS
+  #include <X11/Xlib.h>
+  #include <X11/Xresource.h>
+  #include <X11/Xutil.h>
+  #undef KeyPress
+ #endif
  #include <unistd.h>
 #endif
 

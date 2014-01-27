@@ -27,7 +27,7 @@
 
 
 //==============================================================================
-#if JUCE_LINUX || DOXYGEN
+#if JUCE_USE_XEVENTS || DOXYGEN
 
 /** A handy class that uses XLockDisplay and XUnlockDisplay to lock the X server
     using RAII (Only available in Linux!).

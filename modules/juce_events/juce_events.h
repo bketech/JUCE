@@ -28,6 +28,15 @@
 //=============================================================================
 #include "../juce_core/juce_core.h"
 
+//=============================================================================
+/** Config: JUCE_USE_XEVENTS
+
+    Disable this if you want to use juce_events and not depend on Xlib
+*/
+#ifndef JUCE_USE_XEVENTS
+ #define JUCE_USE_XEVENTS 1
+#endif
+
 namespace juce
 {
 

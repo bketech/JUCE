@@ -22,6 +22,7 @@
   ==============================================================================
 */
 
+#if JUCE_USE_XEVENTS
 #if JUCE_DEBUG && ! defined (JUCE_DEBUG_XERRORS)
  #define JUCE_DEBUG_XERRORS 1
 #endif
@@ -39,6 +40,12 @@ SelectionRequestCallback handleSelectionRequest = nullptr;
 //==============================================================================
 ScopedXLock::ScopedXLock()       { XLockDisplay (display); }
 ScopedXLock::~ScopedXLock()      { XUnlockDisplay (display); }
+#else
+
+typedef bool (*EventQueryCallback)();
+EventQueryCallback eventQueryCallback = nullptr;
+
+#endif
 
 //==============================================================================
 class InternalMessageQueue
@@ -87,6 +94,7 @@ public:
 
     bool dispatchNextEvent()
     {
+        jassert (MessageManager::isThisTheMessageThread());
         // This alternates between giving priority to XEvents or internal messages,
         // to keep everything running smoothly..
         if ((++totalEventCount & 1) != 0)
@@ -101,12 +109,14 @@ public:
         if (! isEmpty())
             return true;
 
+       #if JUCE_USE_XEVENTS
         if (display != 0)
         {
             ScopedXLock xlock;
             if (XPending (display))
                 return true;
         }
+       #endif
 
         struct timeval tv;
         tv.tv_sec = 0;
@@ -118,6 +128,7 @@ public:
         FD_ZERO (&readset);
         FD_SET (fd0, &readset);
 
+       #if JUCE_USE_XEVENTS
         if (display != 0)
         {
             ScopedXLock xlock;
@@ -125,13 +136,14 @@ public:
             FD_SET (fd1, &readset);
             fdmax = jmax (fd0, fd1);
         }
+       #endif
 
         const int ret = select (fdmax + 1, &readset, 0, 0, &tv);
         return (ret > 0); // ret <= 0 if error or timeout
     }
 
     //==============================================================================
-    juce_DeclareSingleton_SingleThreaded_Minimal (InternalMessageQueue);
+    juce_DeclareSingleton_SingleThreaded_Minimal (InternalMessageQueue)
 
 private:
     CriticalSection lock;
@@ -154,6 +166,7 @@ private:
 
     static bool dispatchNextXEvent()
     {
+       #if JUCE_USE_XEVENTS
         if (display == 0)
             return false;
 
@@ -172,7 +185,10 @@ private:
             handleSelectionRequest (evt.xselectionrequest);
         else if (evt.xany.window != juce_messageWindowHandle && dispatchWindowMessage != nullptr)
             dispatchWindowMessage (evt);
-
+       #else
+        if (eventQueryCallback != nullptr)
+            eventQueryCallback();
+       #endif
         return true;
     }
 
@@ -217,6 +233,8 @@ namespace LinuxErrorHandling
 {
     static bool errorOccurred = false;
     static bool keyboardBreakOccurred = false;
+
+   #if JUCE_USE_XEVENTS
     static XErrorHandler oldErrorHandler = (XErrorHandler) 0;
     static XIOErrorHandler oldIOErrorHandler = (XIOErrorHandler) 0;
 
@@ -264,6 +282,7 @@ namespace LinuxErrorHandling
             oldErrorHandler = 0;
         }
     }
+   #endif
 
     //==============================================================================
     void keyboardBreakSignalHandler (int sig)
@@ -289,6 +308,7 @@ void MessageManager::doPlatformSpecificInitialisation()
 {
     if (JUCEApplicationBase::isStandaloneApp())
     {
+      #if JUCE_USE_XEVENTS
         // Initialise xlib for multiple thread support
         static bool initThreadCalled = false;
 
@@ -306,12 +326,15 @@ void MessageManager::doPlatformSpecificInitialisation()
         }
 
         LinuxErrorHandling::installXErrorHandlers();
+       #endif
+
         LinuxErrorHandling::installKeyboardBreakHandler();
     }
 
     // Create the internal message queue
     InternalMessageQueue::getInstance();
 
+   #if JUCE_USE_XEVENTS
     // Try to connect to a display
     String displayName (getenv ("DISPLAY"));
     if (displayName.isEmpty())
@@ -335,12 +358,14 @@ void MessageManager::doPlatformSpecificInitialisation()
                                                   DefaultVisual (display, screen),
                                                   CWEventMask, &swa);
     }
+   #endif
 }
 
 void MessageManager::doPlatformSpecificShutdown()
 {
     InternalMessageQueue::deleteInstance();
 
+   #if JUCE_USE_XEVENTS
     if (display != 0 && ! LinuxErrorHandling::errorOccurred)
     {
         XDestroyWindow (display, juce_messageWindowHandle);
@@ -351,6 +376,7 @@ void MessageManager::doPlatformSpecificShutdown()
 
         LinuxErrorHandling::removeXErrorHandlers();
     }
+   #endif
 }
 
 bool MessageManager::postMessageToSystemQueue (MessageManager::MessageBase* const message)
