@@ -92,7 +92,8 @@ namespace SocketHelpers
     static int readSocket (const SocketHandle handle,
                            void* const destBuffer, const int maxBytesToRead,
                            bool volatile& connected,
-                           const bool blockUntilSpecifiedAmountHasArrived) noexcept
+                           const bool blockUntilSpecifiedAmountHasArrived,
+                           String& address) noexcept
     {
         int bytesRead = 0;
 
@@ -100,6 +101,26 @@ namespace SocketHelpers
         {
             int bytesThisTime;
 
+            // !!! A&L / BKE sddtions.
+            // Use recvfrom in order to obtain the sender address
+            
+            struct sockaddr socketAddress;
+           #if defined (JUCE_LINUX) || (defined (JUCE_MAC) && ! MACOS_10_2_OR_EARLIER)
+            socklen_t len = sizeof (sockaddr);
+           #else
+            int len = sizeof (sockaddr);
+           #endif
+            
+            while ((bytesThisTime = recvfrom (handle, addBytesToPointer (destBuffer, bytesRead),
+                                              maxBytesToRead - bytesRead, 0,
+                                              &socketAddress, &len)) < 0
+                   && errno == EAGAIN)
+            { }
+            
+            if (bytesThisTime >= 0)
+                address = String::fromUTF8 (inet_ntoa (((struct sockaddr_in*) &socketAddress)->sin_addr));
+            
+           #if 0 // disable original juce implementation
            #if JUCE_WINDOWS
             bytesThisTime = recv (handle, static_cast<char*> (destBuffer) + bytesRead, maxBytesToRead - bytesRead, 0);
            #else
@@ -110,7 +131,8 @@ namespace SocketHelpers
             {
             }
            #endif
-
+           #endif
+            
             if (bytesThisTime <= 0 || ! connected)
             {
                 if (bytesRead == 0)
@@ -295,8 +317,10 @@ StreamingSocket::~StreamingSocket()
 int StreamingSocket::read (void* destBuffer, const int maxBytesToRead,
                            const bool blockUntilSpecifiedAmountHasArrived)
 {
+    String address;
     return (connected && ! isListener) ? SocketHelpers::readSocket (handle, destBuffer, maxBytesToRead,
-                                                                    connected, blockUntilSpecifiedAmountHasArrived)
+                                                                    connected, blockUntilSpecifiedAmountHasArrived,
+                                                                    address)
                                        : -1;
 }
 
@@ -567,7 +591,8 @@ int DatagramSocket::waitUntilReady (const bool readyForReading,
 int DatagramSocket::read (void* destBuffer, const int maxBytesToRead, const bool blockUntilSpecifiedAmountHasArrived)
 {
     return connected ? SocketHelpers::readSocket (handle, destBuffer, maxBytesToRead,
-                                                  connected, blockUntilSpecifiedAmountHasArrived)
+                                                  connected, blockUntilSpecifiedAmountHasArrived,
+                                                  lastReadAddress)
                      : -1;
 }
 
