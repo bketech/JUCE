@@ -234,6 +234,9 @@ public:
     /** Returns the name of the currently connected host. */
     const String& getHostName() const noexcept                  { return hostName; }
 
+    /** Returns the address from which the last successful read call received data. */
+    const String& getLastReadAddress() const                    { return lastReadAddress; }
+    
     /** Returns the port number that's currently open. */
     int getPort() const noexcept                                { return portNumber; }
 
@@ -292,6 +295,7 @@ public:
 private:
     //==============================================================================
     String hostName;
+    String lastReadAddress;
     int volatile portNumber, handle;
     bool connected, allowBroadcast;
     void* serverAddress;
