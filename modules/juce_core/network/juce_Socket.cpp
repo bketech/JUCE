@@ -111,7 +111,7 @@ namespace SocketHelpers
             int len = sizeof (sockaddr);
            #endif
             
-            while ((bytesThisTime = recvfrom (handle, addBytesToPointer (destBuffer, bytesRead),
+            while ((bytesThisTime = recvfrom (handle, addBytesToPointer ((char*) destBuffer, bytesRead),
                                               maxBytesToRead - bytesRead, 0,
                                               &socketAddress, &len)) < 0
                    && errno == EAGAIN)
