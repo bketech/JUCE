@@ -145,7 +145,8 @@ void JUCE_CALLTYPE Process::terminate()
    #if JUCE_ANDROID
     _exit (EXIT_FAILURE);
    #else
-    std::_Exit (EXIT_FAILURE);
+    std::exit (EXIT_FAILURE);
+    //std::_Exit (EXIT_FAILURE);
    #endif
 }
 

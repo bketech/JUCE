@@ -62,10 +62,10 @@ void RectanglePlacement::applyTo (double& x, double& y, double& w, double& h,
                                                       : jmin (dw / w, dh / h);
 
         if ((flags & onlyReduceInSize) != 0)
-            scale = jmin (scale, 1.0);
+            scale = jmin (scale, (double)1.0);
 
         if ((flags & onlyIncreaseInSize) != 0)
-            scale = jmax (scale, 1.0);
+            scale = jmax (scale, (double)1.0);
 
         w *= scale;
         h *= scale;

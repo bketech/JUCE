@@ -26,6 +26,7 @@
  #define JUCE_DEBUG_XERRORS 1
 #endif
 
+#if JUCE_USE_X11
 Display* display = nullptr;
 Window juce_messageWindowHandle = None;
 XContext windowHandleXContext;   // This is referenced from Windowing.cpp
@@ -39,6 +40,7 @@ SelectionRequestCallback handleSelectionRequest = nullptr;
 //==============================================================================
 ScopedXLock::ScopedXLock()       { XLockDisplay (display); }
 ScopedXLock::~ScopedXLock()      { XUnlockDisplay (display); }
+#endif
 
 //==============================================================================
 class InternalMessageQueue
@@ -100,14 +102,14 @@ public:
     {
         if (! isEmpty())
             return true;
-
+       #if JUCE_USE_X11
         if (display != 0)
         {
             ScopedXLock xlock;
             if (XPending (display))
                 return true;
         }
-
+       #endif
         struct timeval tv;
         tv.tv_sec = 0;
         tv.tv_usec = timeoutMs * 1000;
@@ -117,7 +119,7 @@ public:
         fd_set readset;
         FD_ZERO (&readset);
         FD_SET (fd0, &readset);
-
+       #if JUCE_USE_X11
         if (display != 0)
         {
             ScopedXLock xlock;
@@ -125,6 +127,7 @@ public:
             FD_SET (fd1, &readset);
             fdmax = jmax (fd0, fd1);
         }
+       #endif
 
         const int ret = select (fdmax + 1, &readset, 0, 0, &tv);
         return (ret > 0); // ret <= 0 if error or timeout
@@ -154,6 +157,7 @@ private:
 
     static bool dispatchNextXEvent()
     {
+       #if JUCE_USE_X11
         if (display == 0)
             return false;
 
@@ -172,7 +176,7 @@ private:
             handleSelectionRequest (evt.xselectionrequest);
         else if (evt.xany.window != juce_messageWindowHandle && dispatchWindowMessage != nullptr)
             dispatchWindowMessage (evt);
-
+       #endif
         return true;
     }
 
@@ -217,6 +221,7 @@ namespace LinuxErrorHandling
 {
     static bool errorOccurred = false;
     static bool keyboardBreakOccurred = false;
+   #if JUCE_USE_X11
     static XErrorHandler oldErrorHandler = (XErrorHandler) 0;
     static XIOErrorHandler oldIOErrorHandler = (XIOErrorHandler) 0;
 
@@ -264,6 +269,7 @@ namespace LinuxErrorHandling
             oldErrorHandler = 0;
         }
     }
+   #endif
 
     //==============================================================================
     void keyboardBreakSignalHandler (int sig)
@@ -294,6 +300,7 @@ void MessageManager::doPlatformSpecificInitialisation()
 
         if (! initThreadCalled)
         {
+           #if JUCE_USE_X11
             if (! XInitThreads())
             {
                 // This is fatal!  Print error and closedown
@@ -301,17 +308,19 @@ void MessageManager::doPlatformSpecificInitialisation()
                 Process::terminate();
                 return;
             }
-
+           #endif
             initThreadCalled = true;
         }
-
+       #if JUCE_USE_X11
         LinuxErrorHandling::installXErrorHandlers();
+       #endif
         LinuxErrorHandling::installKeyboardBreakHandler();
     }
 
     // Create the internal message queue
     InternalMessageQueue::getInstance();
 
+   #if JUCE_USE_X11
     // Try to connect to a display
     String displayName (getenv ("DISPLAY"));
     if (displayName.isEmpty())
@@ -335,12 +344,13 @@ void MessageManager::doPlatformSpecificInitialisation()
                                                   DefaultVisual (display, screen),
                                                   CWEventMask, &swa);
     }
+   #endif
 }
 
 void MessageManager::doPlatformSpecificShutdown()
 {
     InternalMessageQueue::deleteInstance();
-
+   #if JUCE_USE_X11
     if (display != 0 && ! LinuxErrorHandling::errorOccurred)
     {
         XDestroyWindow (display, juce_messageWindowHandle);
@@ -351,6 +361,7 @@ void MessageManager::doPlatformSpecificShutdown()
 
         LinuxErrorHandling::removeXErrorHandlers();
     }
+   #endif
 }
 
 bool MessageManager::postMessageToSystemQueue (MessageManager::MessageBase* const message)

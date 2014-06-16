@@ -1199,7 +1199,7 @@ Path Path::createPathWithRoundedCorners (const float cornerRadius) const
 
                 if (len1 > 0)
                 {
-                    const double propNeeded = jmin (0.5, cornerRadius / len1);
+                    const double propNeeded = jmin ((double)0.5, cornerRadius / len1);
 
                     p.data.elements [p.numElements - 2] = (float) (joinX - (joinX - startX) * propNeeded);
                     p.data.elements [p.numElements - 1] = (float) (joinY - (joinY - startY) * propNeeded);
@@ -1209,7 +1209,7 @@ Path Path::createPathWithRoundedCorners (const float cornerRadius) const
 
                 if (len2 > 0)
                 {
-                    const double propNeeded = jmin (0.5, cornerRadius / len2);
+                    const double propNeeded = jmin ((double)0.5, cornerRadius / len2);
 
                     p.quadraticTo (joinX, joinY,
                                    (float) (joinX + (endX - joinX) * propNeeded),
@@ -1239,7 +1239,7 @@ Path Path::createPathWithRoundedCorners (const float cornerRadius) const
 
                     if (len1 > 0)
                     {
-                        const double propNeeded = jmin (0.5, cornerRadius / len1);
+                        const double propNeeded = jmin ((double)0.5, cornerRadius / len1);
 
                         p.data.elements [p.numElements - 2] = (float) (joinX - (joinX - startX) * propNeeded);
                         p.data.elements [p.numElements - 1] = (float) (joinY - (joinY - startY) * propNeeded);
@@ -1249,7 +1249,7 @@ Path Path::createPathWithRoundedCorners (const float cornerRadius) const
 
                     if (len2 > 0)
                     {
-                        const double propNeeded = jmin (0.5, cornerRadius / len2);
+                        const double propNeeded = jmin ((double)0.5, cornerRadius / len2);
 
                         endX = (float) (joinX + (endX - joinX) * propNeeded);
                         endY = (float) (joinY + (endY - joinY) * propNeeded);
