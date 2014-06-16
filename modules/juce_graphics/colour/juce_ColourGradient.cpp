@@ -70,7 +70,7 @@ int ColourGradient::addColour (const double proportionAlongGradient, Colour colo
     // must be within the two end-points
     jassert (proportionAlongGradient >= 0 && proportionAlongGradient <= 1.0);
 
-    const double pos = jlimit (0.0, 1.0, proportionAlongGradient);
+    const double pos = jlimit ((double)0.0, (double)1.0, proportionAlongGradient);
 
     int i;
     for (i = 0; i < colours.size(); ++i)

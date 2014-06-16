@@ -596,7 +596,7 @@ void Graphics::drawDashedLine (const Line<float>& line, const float* const dashL
             if ((n & 1) != 0)
             {
                 const Line<float> segment (line.getStart() + (delta * lastAlpha).toFloat(),
-                                           line.getStart() + (delta * jmin (1.0, alpha)).toFloat());
+                                           line.getStart() + (delta * jmin ((double)1.0, alpha)).toFloat());
 
                 if (lineThickness != 1.0f)
                     drawLine (segment, lineThickness);
