@@ -46,7 +46,7 @@ void ResamplingAudioSource::setResamplingRatio (const double samplesInPerOutputS
     jassert (samplesInPerOutputSample > 0);
 
     const SpinLock::ScopedLockType sl (ratioLock);
-    ratio = jmax (0.0, samplesInPerOutputSample);
+    ratio = jmax ((double)0.0, samplesInPerOutputSample);
 }
 
 void ResamplingAudioSource::prepareToPlay (int samplesPerBlockExpected,
@@ -195,7 +195,7 @@ void ResamplingAudioSource::createLowPass (const double frequencyRatio)
     const double proportionalRate = (frequencyRatio > 1.0) ? 0.5 / frequencyRatio
                                                            : 0.5 * frequencyRatio;
 
-    const double n = 1.0 / std::tan (double_Pi * jmax (0.001, proportionalRate));
+    const double n = (double)1.0 / std::tan (double_Pi * jmax ((double)0.001, proportionalRate));
     const double nSquared = n * n;
     const double c1 = 1.0 / (1.0 + std::sqrt (2.0) * n + nSquared);
 

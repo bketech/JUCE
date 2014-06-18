@@ -102,7 +102,7 @@ IIRCoefficients IIRCoefficients::makeLowShelf (const double sampleRate,
     const double A = jmax (0.0f, std::sqrt (gainFactor));
     const double aminus1 = A - 1.0;
     const double aplus1 = A + 1.0;
-    const double omega = (double_Pi * 2.0 * jmax (cutOffFrequency, 2.0)) / sampleRate;
+    const double omega = (double_Pi * (double)2.0 * jmax (cutOffFrequency, (double)2.0)) / sampleRate;
     const double coso = std::cos (omega);
     const double beta = std::sin (omega) * std::sqrt (A) / Q;
     const double aminus1TimesCoso = aminus1 * coso;
@@ -126,7 +126,7 @@ IIRCoefficients IIRCoefficients::makeHighShelf (const double sampleRate,
     const double A = jmax (0.0f, std::sqrt (gainFactor));
     const double aminus1 = A - 1.0;
     const double aplus1 = A + 1.0;
-    const double omega = (double_Pi * 2.0 * jmax (cutOffFrequency, 2.0)) / sampleRate;
+    const double omega = (double_Pi * (double)2.0 * jmax (cutOffFrequency, (double)2.0)) / sampleRate;
     const double coso = std::cos (omega);
     const double beta = std::sin (omega) * std::sqrt (A) / Q;
     const double aminus1TimesCoso = aminus1 * coso;
@@ -148,7 +148,7 @@ IIRCoefficients IIRCoefficients::makePeakFilter (const double sampleRate,
     jassert (Q > 0);
 
     const double A = jmax (0.0f, std::sqrt (gainFactor));
-    const double omega = (double_Pi * 2.0 * jmax (centreFrequency, 2.0)) / sampleRate;
+    const double omega = (double_Pi * (double)2.0 * jmax (centreFrequency, (double)2.0)) / sampleRate;
     const double alpha = 0.5 * std::sin (omega) / Q;
     const double c2 = -2.0 * std::cos (omega);
     const double alphaTimesA = alpha * A;
