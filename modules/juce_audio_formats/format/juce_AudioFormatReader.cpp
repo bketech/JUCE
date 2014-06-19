@@ -294,7 +294,7 @@ int64 AudioFormatReader::searchForLevel (int64 startSample,
 
     jassert (magnitudeRangeMaximum > magnitudeRangeMinimum);
 
-    const double doubleMin = jlimit (0.0, (double) std::numeric_limits<int>::max(), magnitudeRangeMinimum * std::numeric_limits<int>::max());
+    const double doubleMin = jlimit ((double)0.0, (double) std::numeric_limits<int>::max(), magnitudeRangeMinimum * std::numeric_limits<int>::max());
     const double doubleMax = jlimit (doubleMin, (double) std::numeric_limits<int>::max(), magnitudeRangeMaximum * std::numeric_limits<int>::max());
     const int intMagnitudeRangeMinimum = roundToInt (doubleMin);
     const int intMagnitudeRangeMaximum = roundToInt (doubleMax);
